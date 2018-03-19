@@ -351,9 +351,15 @@ namespace EvolirisCSharpTraining
             {
                 argA.Insert(0, '0');
             }
+            //Also append a zero in front
+            //This is required by the final carry
+            //E.g. in 92 + 12 = 104 we need three digits to write the final number
+            //Hence we need to add an additional '0' i.e. argA=092 and argB=012
+            argA.Insert(0, '0');
+            argB.Insert(0, '0');
 
-            List<int> result = new List<int>();
-            result.AddRange(new int[argA.Count]);
+            List<char> result = new List<char>();
+            result.AddRange(new char[argA.Count]);
             int carry = 0;
 
             //For each digit compute sum and take carry, then move to next digit
@@ -365,12 +371,11 @@ namespace EvolirisCSharpTraining
                 int digitB = argB[digitIndex] - '0';
                 int sum = digitA + digitB;
                 int digitSum = sum % 10;
-                result[digitIndex] = digitSum + carry;
+                result[digitIndex] = (char)(digitSum + carry + '0');
                 carry = sum / 10;
             }
-            result.Insert(0, carry);
 
-            foreach (int digit in result)
+            foreach (char digit in result)
             {
                 Console.Write($"{digit}");
             }
