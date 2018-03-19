@@ -309,7 +309,7 @@ namespace EvolirisCSharpTraining
             Console.Write("Prime numbers:1 2 ");
             while (numberToTest < nbMax)
             {
-                if (isAPrimeNb_list(numberToTest, primeNumbers))
+                if (isAPrimeNb(numberToTest, primeNumbers))
                 {
                     primeNumbers.Add(numberToTest);
                     Console.Write($"{numberToTest} ");
@@ -380,7 +380,8 @@ namespace EvolirisCSharpTraining
         static bool isAPrimeNb(int numberToTest, int[] primeNumbers,
                        int nbOfPrimesFound)
         {
-            //Prime number 1 is not in the table => "nbOfPrimesFound-1"
+            //Prime number 1 is not in primeNumbers[] => "nbOfPrimesFound-1"
+            //1 must not be in primeNumbers[] because numberToTest % 1 is always 0
             for (int indexOfPrime = 0; indexOfPrime < nbOfPrimesFound - 1; indexOfPrime++)
             {
                 int prime = primeNumbers[indexOfPrime];
@@ -397,7 +398,7 @@ namespace EvolirisCSharpTraining
             return Math.Max(1.0, argument) * worstRelativeError;
         }
 
-        static bool isAPrimeNb_list(int numberToTest, List<int> primeNumbers)
+        static bool isAPrimeNb(int numberToTest, List<int> primeNumbers)
         {
             //Prime number 1 is not in the table => "nbOfPrimesFound-1"
             foreach(int prime in primeNumbers)
