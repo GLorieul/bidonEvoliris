@@ -12,22 +12,22 @@ namespace EvolirisCSharpTraining
         {
             Console.Title = "Ma Console Cherie";
 
-            Session01.Exercise01.Run();
-            Session01.Exercise02.Run();
-            Session01.Exercise03.QuestionA.Run();
-            Session01.Exercise03.QuestionB.Run();
-            Session01.Exercise03.QuestionC.Run();
+            //Session01.Exercise01.Run();
+            //Session01.Exercise02.Run();
+            //Session01.Exercise03.QuestionA.Run();
+            //Session01.Exercise03.QuestionB.Run();
+            //Session01.Exercise03.QuestionC.Run();
 
-            Session02.Exercise01.QuestionA.Run();
-            Session02.Exercise01.QuestionB.Run();
-            Session02.Exercise01.QuestionC.Run();
-            Session02.Exercise01.QuestionD.Run();
-            Session02.Exercise01.QuestionE.Run();
-            Session02.Exercise01.QuestionF.Run();
+            //Session02.Exercise01.QuestionA.Run();
+            //Session02.Exercise01.QuestionB.Run();
+            //Session02.Exercise01.QuestionC.Run();
+            //Session02.Exercise01.QuestionD.Run();
+            //Session02.Exercise01.QuestionE.Run();
+            //Session02.Exercise01.QuestionF.Run();
             
-            Session02.Exercise02.QuestionA.Run();
-            Session02.Exercise02.QuestionB.Run();
-            Session02.Exercise02.QuestionC.Run();
+            //Session02.Exercise02.QuestionA.Run();
+            //Session02.Exercise02.QuestionB.Run();
+            //Session02.Exercise02.QuestionC.Run();
 
             Session03.Exercise01.Main.Run();
 
@@ -497,10 +497,12 @@ namespace EvolirisCSharpTraining
                     Console.Write("c:");
                     quadraticSolver.c = double.Parse(Console.ReadLine());
 
-                    Nullable<double> rootA, rootB;
+                    double? rootA, rootB; //Equivalent to "Nullable<double> rootA, rootB;"
                     bool areRootsFound = quadraticSolver.Solve(out rootA, out rootB);
+                    //Usage of "var.Value" instead of "var" is recommended
+                    //for nullable types (does not give access to same methods)
                     string message = (areRootsFound ?
-                                      $"roots = {rootA:0.000}, {rootB:0.000}"
+                                      $"roots = {rootA.Value:0.000}, {rootB.Value:0.000}"
                                      : "No real root found");
                     Console.WriteLine(message);
                     Console.WriteLine();
@@ -513,15 +515,14 @@ namespace EvolirisCSharpTraining
             {
                 //Solves quadratic equation in the real space
                 //Returns true if at least one real root has been found
-                public bool Solve(out Nullable<double> rootA, out Nullable<double> rootB)
+                public bool Solve(out double? rootA, out double? rootB)
                 {
                     double discriminant = b * b - 4.0 * a * c;
 
                     bool areRootsComplex = discriminant < 0.0;
                     if (areRootsComplex)
                     {
-                        rootA = null;
-                        rootB = null;
+                        rootA = rootB = null;
                         return false;
                     }
 
