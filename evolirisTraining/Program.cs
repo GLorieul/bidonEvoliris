@@ -27,7 +27,9 @@ namespace EvolirisCSharpTraining
 
             //Session02.exercice02_questionA();
             //Session02.exercice02_questionB();
-            Session02.exercice02_questionC();
+            //Session02.exercice02_questionC();
+
+            Session03.exercice01();
 
             Console.ReadLine();
         }
@@ -417,11 +419,54 @@ namespace EvolirisCSharpTraining
         }
     }
 
+    /// Solve quadratic equation
+    /// a.x^2 + b.x + c = 0
+    public struct QuadraticSolver
+    {
+        //Solves quadratic equation in the real space
+        //Returns true if at least one real root has been found
+        public bool Solve(out Nullable<double> rootA, out Nullable<double> rootB)
+        {
+            double discriminant = b*b - 4.0*a*c;
+
+            bool areRootsComplex = discriminant < 0.0;
+            if (areRootsComplex)
+            {
+                rootA = null;
+                rootB = null;
+                return false;
+            }
+
+            //Works both for discriminant > 0 and =0
+            rootA = (-b - Math.Sqrt(discriminant)) * 0.5 / a;
+            rootB = (-b + Math.Sqrt(discriminant)) * 0.5 / a;
+            return true;
+        }
+
+        public double a, b, c;
+    }
+
     class Session03
     {
+        /// Solve quadratic equation using a struct type
         static public void exercice01()
         {
-            //To do
+            QuadraticSolver quadraticSolver = new QuadraticSolver();
+
+            Console.Write("a:");
+            quadraticSolver.a = double.Parse(Console.ReadLine());
+            Console.Write("b:");
+            quadraticSolver.b = double.Parse(Console.ReadLine());
+            Console.Write("c:");
+            quadraticSolver.c = double.Parse(Console.ReadLine());
+
+            Nullable<double> rootA, rootB;
+            bool areRootsFound = quadraticSolver.Solve(out rootA, out rootB);
+            string message = (areRootsFound ?
+                              $"roots = {rootA:0.000}, {rootB:0.000}"
+                             :"No real root found");
+            Console.WriteLine(message);
+            Console.WriteLine();
         }
     }
 }
