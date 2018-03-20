@@ -33,7 +33,7 @@ namespace EvolirisCSharpTraining
         }
     }
 
-    //Type conversions
+    ///Session01 covers type conversion and branching
     class Session01
     {
         ///Playing with *.Parse() and *.TryParse()
@@ -169,7 +169,7 @@ namespace EvolirisCSharpTraining
         }
     }
 
-    //Loops and arrays
+    ///Session02 covers loops, arrays and collections
     class Session02
     {
         ///Computes n first terms of Fibonacci sequence
@@ -385,8 +385,8 @@ namespace EvolirisCSharpTraining
         static bool isAPrimeNb(int numberToTest, int[] primeNumbers,
                        int nbOfPrimesFound)
         {
-            //Prime number 1 is not in primeNumbers[] => "nbOfPrimesFound-1"
             //1 must not be in primeNumbers[] because numberToTest % 1 is always 0
+            //Prime number 1 is not in primeNumbers[] => "nbOfPrimesFound-1"
             for (int indexOfPrime = 0; indexOfPrime < nbOfPrimesFound - 1; indexOfPrime++)
             {
                 int prime = primeNumbers[indexOfPrime];
@@ -405,8 +405,8 @@ namespace EvolirisCSharpTraining
 
         static bool isAPrimeNb(int numberToTest, List<int> primeNumbers)
         {
-            //Prime number 1 is not in the table => "nbOfPrimesFound-1"
-            foreach(int prime in primeNumbers)
+            //1 must not be in primeNumbers[] because numberToTest % 1 is always 0
+            foreach (int prime in primeNumbers)
             {
                 if ((numberToTest % prime) == 0)
                 {
@@ -414,6 +414,14 @@ namespace EvolirisCSharpTraining
                 }
             }
             return true;
+        }
+    }
+
+    class Session03
+    {
+        static public void exercice01()
+        {
+            //To do
         }
     }
 }
