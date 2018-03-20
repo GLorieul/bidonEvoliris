@@ -154,7 +154,10 @@ namespace EvolirisCSharpTraining
 
     class MainMenu : Menu
     {
-        public MainMenu() : base("Session01", "Session02", "Session03")
+        public MainMenu()
+            :base("Session01: Type conversion and branching (Fri 16 March)",
+                  "Session02: Loops, arrays and collections (Mon 19 March)",
+                  "Session03: Functions, structs and enumerations (Tue 20 March)")
         { /*Do nothing*/ }
 
         protected override void action00() { RunSubmenu<MenuSession01>(); }
@@ -164,7 +167,13 @@ namespace EvolirisCSharpTraining
 
     class MenuSession01 : Menu
     {
-        public MenuSession01() : base("..", "Exercise01", "Exercise02", "Exercise03") { /*Do nothing*/ }
+        public MenuSession01()
+            :base("..",
+                  "Exercise01: Parsing from console input with *.Parse() and *.TryParse()",
+                  "Exercise02: Telling whether number is odd or even",
+                  "Exercise03: Conversions and playing with BBAN & IBAN numbers")
+        { /*Do nothing*/ }
+
         protected override void action00() { GoToParentMenu(); }
         protected override void action01() { Session01.Exercise01.Run(); }
         protected override void action02() { Session01.Exercise02.Run(); }
@@ -173,7 +182,13 @@ namespace EvolirisCSharpTraining
 
     class MenuSess01Exo03 : Menu
     {
-        public MenuSess01Exo03() : base("..", "QuestionA", "QuestionB", "QuestionC") { /*Do nothing*/ }
+        public MenuSess01Exo03()
+            :base("..",
+                  "QuestionA: Explicit conversions",
+                  "QuestionB: Check that checksum of Belgian BBAN account number is correct",
+                  "QuestionC: Converts Belgian BBAN into IBAN account number")
+        { /*Do nothing*/ }
+
         protected override void action00() { GoToParentMenu(); }
         protected override void action01() { Session01.Exercise03.QuestionA.Run(); }
         protected override void action02() { Session01.Exercise03.QuestionB.Run(); }
@@ -182,7 +197,12 @@ namespace EvolirisCSharpTraining
 
     class MenuSession02 : Menu
     {
-        public MenuSession02() : base("..", "Exercise01", "Exercise02") { /*Do nothing*/ }
+        public MenuSession02()
+            :base("..",
+                  "Exercise01: Loops",
+                  "Exercise02: Collections")
+        { /*Do nothing*/ }
+
         protected override void action00() { GoToParentMenu(); }
         protected override void action01() { RunSubmenu<MenuSess02Exo01>(); }
         protected override void action02() { RunSubmenu<MenuSess02Exo02>(); }
@@ -191,8 +211,15 @@ namespace EvolirisCSharpTraining
     class MenuSess02Exo01 : Menu
     {
         public MenuSess02Exo01()
-            : base("..", "QuestionA", "QuestionB", "QuestionC", "QuestionD",
-                   "QuestionE", "QuestionF") { /*Do nothing*/ }
+            :base("..",
+                  "QuestionA: Computes n first terms of Fibonacci sequence",
+                  "QuestionB: Computes factorial of a number",
+                  "QuestionC: Find n first prime numbers",
+                  "QuestionD: Displays a multiplication table",
+                  "QuestionE: Count from 0 to 20 stepping by 0.1 and using a double type",
+                  "QuestionF: Computes an approximation of the square root")
+        { /*Do nothing*/ }
+
         protected override void action00() { GoToParentMenu(); }
         protected override void action01() { Session02.Exercise01.QuestionA.Run(); }
         protected override void action02() { Session02.Exercise01.QuestionB.Run(); }
@@ -205,8 +232,12 @@ namespace EvolirisCSharpTraining
     class MenuSess02Exo02 : Menu
     {
         public MenuSess02Exo02()
-            : base("..", "QuestionA", "QuestionB", "QuestionC")
+            :base("..",
+                  "QuestionA: Find prime numbers below nbMax",
+                  "QuestionB: Find n first prime numbers",
+                  "QuestionC: Add two numbers digit by digit")
         { /*Do nothing*/ }
+
         protected override void action00() { GoToParentMenu(); }
         protected override void action01() { Session02.Exercise02.QuestionA.Run(); }
         protected override void action02() { Session02.Exercise02.QuestionB.Run(); }
@@ -215,7 +246,11 @@ namespace EvolirisCSharpTraining
 
     class MenuSession03 : Menu
     {
-        public MenuSession03() : base("..", "Exercise01") { /*Do nothing*/ }
+        public MenuSession03()
+            :base("..",
+                 "Exercise01: Solve quadratic equation using a struct type")
+        { /*Do nothing*/ }
+
         protected override void action00() { GoToParentMenu(); }
         protected override void action01() { Session03.Exercise01.Main.Run(); }
     }
@@ -224,7 +259,7 @@ namespace EvolirisCSharpTraining
     ///Fri 16 March
     namespace Session01
     {
-        ///Playing with *.Parse() and *.TryParse()
+        ///Parsing from console input with *.Parse() and *.TryParse()
         ///Slide #87
         class Exercise01
         {
@@ -245,10 +280,12 @@ namespace EvolirisCSharpTraining
                 {
                     Console.WriteLine("Illegal input.");
                 }
+                Console.ReadLine();
             }
         }
 
-        ///Playing with C# branching instructions
+        ///Telling whether number is odd or even
+        ///(playing with C# branching instructions)
         ///Slide #97
         class Exercise02
         {
@@ -289,10 +326,11 @@ namespace EvolirisCSharpTraining
             }
         }
 
+        ///Conversions and playing with BBAN & IBAN numbers
         ///Slide #114
         namespace Exercise03
         {
-            ///Playing with explicit conversions
+            ///Explicit conversions
             class QuestionA
             {
                 static public void Run()
@@ -305,17 +343,20 @@ namespace EvolirisCSharpTraining
                     Console.WriteLine($"A  /  B = {(double)(nbA) / (double)(nbB)}");
                     Console.WriteLine($"A Div B = {nbA / nbB}");
                     Console.WriteLine($"A  %  B = {nbA % nbB}");
+
+                    Console.ReadLine();
                 }
             }
 
-            ///Check that the checksum of a Belgian BBAN account number is correct
-            ///First the checksum is computed from the inputted BBAN
-            ///Then it is compared to the checksum specified in the inputted BBAN
-            ///Input example: 732-0311849-45
+            ///Check that checksum of Belgian BBAN account number is correct
             class QuestionB
             {
                 static public void Run()
                 {
+                    //First the checksum is computed from the inputted BBAN
+                    //Then it is compared to the checksum specified in the inputted BBAN
+                    //Input example: 732-0311849-45
+
                     Console.Write("BBAN=");
                     string bban = Console.ReadLine();
 
@@ -327,10 +368,12 @@ namespace EvolirisCSharpTraining
                     bool isValidBban = ((bbanNb % 97) == bbanChecksum);
                     string message = isValidBban ? "OK" : "KO";
                     Console.WriteLine(message);
+
+                    Console.ReadLine();
                 }
             }
 
-            ///Converts a Belgian BBAN account number into an IBAN account number
+            ///Converts Belgian BBAN into IBAN account number
             ///Input example: 732-0311849-45
             class QuestionC
             {
@@ -352,6 +395,8 @@ namespace EvolirisCSharpTraining
                     string iban = IBAN_COUNTRY + ibanChecksum.ToString()
                                   + bbanNb.ToString() + bbanChecksum.ToString();
                     Console.WriteLine($"IBAN=\"{ibanToDisplayString(iban)}\"");
+
+                    Console.ReadLine();
                 }
 
                 static long computeIbanChecksum(string ibanCountry, long bbanNb, long bbanChecksum)
@@ -378,6 +423,7 @@ namespace EvolirisCSharpTraining
     }
 
     ///Session02 covers loops, arrays and collections
+    ///Mon 19 March
     namespace Session02
     {
         ///Exercises on loops
@@ -400,10 +446,12 @@ namespace EvolirisCSharpTraining
                         element1 = newElement;
                         Console.Write($"{newElement} ");
                     }
+
+                    Console.ReadLine();
                 }
             }
 
-            ///Computes factorial
+            ///Computes factorial of a number
             class QuestionB
             {
                 static public void Run()
@@ -417,10 +465,11 @@ namespace EvolirisCSharpTraining
                         factorial *= iteration;
                     }
                     Console.WriteLine($"{argument}!={factorial}");
+                    Console.ReadLine();
                 }
             }
 
-            ///Find prime numbers
+            ///Find n prime numbers
             class QuestionC
             {
                 static public void Run()
@@ -446,6 +495,7 @@ namespace EvolirisCSharpTraining
                         //Even numbers can't possibly be prime numbers => skip them => +=2
                         numberToTest += 2;
                     }
+                    Console.ReadLine();
                 }
 
                 static bool isAPrimeNb(int numberToTest, int[] primeNumbers,
@@ -482,7 +532,8 @@ namespace EvolirisCSharpTraining
                         {
                             Console.Write($"{multiplicant * multiplier}\t");
                         }
-                        Console.Write("\n");
+                        Console.WriteLine();
+                        Console.ReadLine();
                     }
                 }
             }
@@ -539,6 +590,7 @@ namespace EvolirisCSharpTraining
                     }
                     Console.WriteLine($"sqrt({argument}) = {guess}");
                     Console.WriteLine($"Max absolute error = {worstAbsoluteError}");
+                    Console.ReadLine();
                 }
 
                 static double computeWorstAbsoluteError(double argument, double worstRelativeError)
@@ -576,6 +628,7 @@ namespace EvolirisCSharpTraining
                         //Even numbers can't possibly be prime numbers => skip them => +=2
                         numberToTest += 2;
                     }
+                    Console.ReadLine();
                 }
 
                 static bool isAPrimeNb(int numberToTest, List<int> primeNumbers)
@@ -592,11 +645,14 @@ namespace EvolirisCSharpTraining
                 }
             }
 
-            ///Almost identical to Exercise02.QuestionB => I'm not doing it
+            ///Almost identical to QuestionA => I'm not doing it!
             class QuestionB
             {
                 static public void Run()
-                { /*Do nothing*/ }
+                {
+                    Console.WriteLine("Almost identical to QuestionA => I'm not doing it!");
+                    Console.ReadLine();
+                }
             }
 
             /// Add two numbers digit by digit
@@ -658,11 +714,14 @@ namespace EvolirisCSharpTraining
                         Console.Write($"{digit}");
                     }
                     Console.WriteLine();
+                    Console.ReadLine();
                 }
             }
         }
     }
     
+    /// Session03 covers functions, structs and enumerations
+    /// Tue 20 March
     namespace Session03
     {
         /// Solve quadratic equation using a struct type
