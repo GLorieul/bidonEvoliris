@@ -12,9 +12,7 @@ namespace EvolirisCSharpTraining
             MainMenu menuSession = new MainMenu();
             menuSession.Run();
 
-            Session03.Exercise01.Main.Run();
-
-            Console.ReadLine();
+            //Session03.Exercise02.Main.Run();
         }
 
     }
@@ -541,6 +539,64 @@ namespace EvolirisCSharpTraining
                 }
 
                 public double a, b, c;
+            }
+        }
+
+        /// Playing with classes, getters, setters and auto-properties
+        /// Exercise not present in the lecture's slides
+        namespace Exercise02
+        {
+            class Person
+            {
+                public string Surname { get; set; }
+                public string FirstName { get; set; }
+                public DateTime DateTimeOfBirth { get; set; }
+
+                public string Label
+                {
+                    get { return FirstName + " " + Surname; }
+                    //In C#5.0 this is also legal
+                    //get => FirstName + " " + Surname;
+                }
+
+            }
+
+            class BankAccount
+            {
+                public BankAccount(Person OwnerVal)
+                {
+                    Owner = OwnerVal;
+                }
+
+                public void deposit(long amountToDeposit)
+                { _Amount += amountToDeposit; }
+
+                public void withdraw(long amountToWithDraw)
+                { _Amount -= amountToWithDraw; }
+
+                //Member variable _Amount is required because assigning to
+                //property Amount is illegal (no setter defined), even when
+                //assignation is performed from within the class implementation
+                private long _Amount = 0;
+                public long Amount { get { return _Amount; } }
+                private Person Owner;
+            }
+
+            class Main
+            {
+                static public void Run()
+                {
+                    Person johnSmith = new Person();
+                    johnSmith.FirstName = "John"; //Calls getter on Person.FirstName
+                    johnSmith.Surname = "Smith"; //Calls getter on Person.Surname
+                    Console.WriteLine($"My name is {johnSmith.Label}"); //Calls setter on Person.Label
+                    BankAccount johnsAccount = new BankAccount(johnSmith);
+                    //johnsAccount.amount = 9001; //Illegal because no setter was defined
+                    johnsAccount.deposit(120);
+                    johnsAccount.withdraw(30);
+                    Console.WriteLine($"and I own ${johnsAccount.Amount}");
+                    Console.ReadLine();
+                }
             }
         }
     }

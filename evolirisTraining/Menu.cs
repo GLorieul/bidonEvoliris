@@ -17,6 +17,7 @@ namespace EvolirisCSharpTraining
     ///       action01() when second menu entry is selected, etc.
     ///     - If a menu only has three items then only action00() to
     ///       action02() need to be implemented
+    ///  - MyMenu has access to two helper functions: GoToParent() and RunSubmenu<>()
     class Menu
     {
         public Menu(params string[] menuEntriesVal)
@@ -229,11 +230,13 @@ namespace EvolirisCSharpTraining
         {
             public Session03()
                 : base("..",
-                     "Exercise01: Solve quadratic equation using a struct type")
+                     "Exercise01: Solve quadratic equation using a struct type",
+                     "Exercise02: Playing with classes, getters, setters and auto-properties")
             { /*Do nothing*/ }
 
             protected override void action00() { GoToParentMenu(); }
             protected override void action01() { EvolirisCSharpTraining.Session03.Exercise01.Main.Run(); }
+            protected override void action02() { EvolirisCSharpTraining.Session03.Exercise02.Main.Run(); }
         }
     }
 }
