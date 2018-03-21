@@ -73,14 +73,19 @@ namespace EvolirisCSharpTraining
             public bool IsTileExplored(Position tilePosition)
             { return GetTile(tilePosition).IsExplored(); }
 
+            public bool IsTileFlagged(Position tilePosition)
+            { return GetTile(tilePosition).IsFlagged(); }
+
             public void ExploreTile(Position tilePosition)
             { GetTile(tilePosition).Explore(); }
-            
+
+            public void FlagTile(Position tilePosition)
+            { GetTile(tilePosition).ToggleFlag(); }
+
             public bool hasNeighbourWithMines(Position tilePosition)
             {
                 int nbNeighbouringMines = CountNeighbouringMines(tilePosition);
-                bool hasNeighbourWithMines = (nbNeighbouringMines > 0);
-                return hasNeighbourWithMines;
+                return (nbNeighbouringMines > 0);
             }
 
             public List<Position> GetPosOfNeighbours(Position tilePos)
@@ -123,8 +128,10 @@ namespace EvolirisCSharpTraining
 
             public void Display()
             {
-                //Put cursor back at console's (0,0) so that new array rewrites old array.
-                //Better than Console.Clear() because the latter makes the display blink.
+                //Put cursor back at console's (0,0) so that new array
+                //overwrites old array.
+                //Better than Console.Clear() because the latter makes
+                //display blink.
                 Console.SetCursorPosition(0, 0);
 
                 //Display is written from top to bottom
@@ -134,16 +141,32 @@ namespace EvolirisCSharpTraining
                 {
                     for (int numColumn = 0; numColumn < NbColumns; numColumn++)
                     {
-                        Position currentPosition = new Position(numRow, numColumn);
-                        Tile currentTile = GetTile(currentPosition);
-                        int nbNeighbouringMines = CountNeighbouringMines(currentPosition);
-                        Console.Write(currentTile.ToString(nbNeighbouringMines));
+                        WriteTileAtCursor(new Cursor(numRow, numColumn));
                     }
                     Console.WriteLine();
                 }
             }
 
-            /// Returns a List<Tile> of the 8 Tile neighbours of a give Tile
+            public void DisplayCurrentTile(Cursor cursor)
+            { DisplayTile(cursor, cursor); }
+
+            public void DisplayTile(Position posOfTile, Cursor cursor)
+            {
+                Cursor originalCursor = new Cursor(cursor);
+                cursor.PlaceOnTile(posOfTile, this);
+                WriteTileAtCursor(cursor); //Also moves cursor by one
+                cursor.PlaceOnTile(originalCursor, this);
+            }
+
+            //Because the cursor is being moved after each write, this function
+            //would be dangerous to be called by code outside the Board class
+            private void WriteTileAtCursor(Cursor cursor)
+            {
+                Tile currentTile = GetTile(cursor);
+                int nbNeighbouringMines = CountNeighbouringMines(cursor);
+                Console.Write(currentTile.ToString(nbNeighbouringMines));
+            }
+
             private List<Tile> GetTileNeighbours(Position currentPos)
             {
                 List<Tile> neighbours = new List<Tile>();
@@ -158,10 +181,10 @@ namespace EvolirisCSharpTraining
                 return neighbours;
             }
 
-            public int CountNeighbouringMines(Position tilePosition)
+            public int CountNeighbouringMines(Position posOfTile)
             {
                 int nbMines = 0;
-                foreach (Tile neighbour in GetTileNeighbours(tilePosition))
+                foreach (Tile neighbour in GetTileNeighbours(posOfTile))
                 {
                     if (neighbour.IsMined())
                     { nbMines++; }
@@ -240,6 +263,12 @@ namespace EvolirisCSharpTraining
             public Cursor() :base(0,0)
             { /*Do nothing*/ }
 
+            public Cursor(int row, int column) : base(row, column)
+            { /*Do nothing*/ }
+
+            public Cursor(Cursor other) : base(other.Row, other.Column)
+            { /*Do nothing*/ }
+
             public void Refresh(Board board)
             { PlaceOnTile(this, board); }
 
@@ -248,6 +277,8 @@ namespace EvolirisCSharpTraining
                 int cursorX = tilePosition.Column;
                 int cursorY = board.NbRows - 1 - tilePosition.Row;
                 Console.SetCursorPosition(cursorX, cursorY);
+                Row = tilePosition.Row;
+                Column = tilePosition.Column;
             }
 
             public void MoveLeftwards(Board board)
@@ -314,14 +345,19 @@ namespace EvolirisCSharpTraining
                         case ConsoleKey.DownArrow: _Cursor.MoveDownwards(_Board); break;
                         case ConsoleKey.UpArrow: _Cursor.MoveUpwards(_Board); break;
                         case ConsoleKey.Enter:
-                            if ( ! _Board.GetTile(_Cursor).IsFlagged())
+                            if (!_Board.IsTileFlagged(_Cursor))
                             { ExploreCurrentTile(isGameContinuing); }
                             break;
-                        case ConsoleKey.Delete: FlagCurrentTile(); break;
+                        case ConsoleKey.Delete:
+                            if (!_Board.IsTileExplored(_Cursor))
+                            {
+                                _Board.FlagTile(_Cursor);
+                                _Board.DisplayCurrentTile(_Cursor);
+                            }
+                            break;
                         //Del = reset
                         case ConsoleKey.Escape: isGameContinuing = false; continue;
                     }
-                    _Board.Display();
                     _Cursor.Refresh(_Board);
                     System.Threading.Thread.Sleep(100);
                 }
@@ -337,17 +373,12 @@ namespace EvolirisCSharpTraining
                 }
 
                 PropagateSafeZone(_Cursor);
-
-                _Board.Display();
-                _Cursor.Refresh(_Board);
             }
-
-            public void FlagCurrentTile()
-            { _Board.GetTile(_Cursor).ToggleFlag(); }
 
             public void PropagateSafeZone(Position centerOfPropagation)
             {
                 _Board.ExploreTile(centerOfPropagation);
+                _Board.DisplayTile(centerOfPropagation, _Cursor);
 
                 if (_Board.hasNeighbourWithMines(centerOfPropagation))
                 { return; }
