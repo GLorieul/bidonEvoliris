@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EvolirisCSharpTraining
 {
-    public enum TypeErrorCode { GENERIC_ERROR=1 }
+    public enum TypeErr { GENERIC_ERROR=1 }
 
     namespace Minesweeper
     {
@@ -16,9 +16,9 @@ namespace EvolirisCSharpTraining
             }
         }
 
-        public class TilePosition
+        public class Position
         {
-            public TilePosition(int rowVal, int columnVal)
+            public Position(int rowVal, int columnVal)
             {
                 Row = rowVal;
                 Column = columnVal;
@@ -35,28 +35,7 @@ namespace EvolirisCSharpTraining
                 NbRows = nbRowsVal;
                 NbColumns = nbColumnsVal;
 
-                //_Data is padded with one "ghost node" on each side of the board
-                //This allows to safely search for tile neighbours anywhere whithin board
-                Tile bidon = new Tile();
-                Tile[] bidonArray = new Tile[2];
-                bidonArray[0] = new Tile();
-                _Data = new Tile[NbRows + 2, NbColumns + 2];
-                //foreach(Tile tile in _Data)
-                //{ tile = new Tile(); }
-                for (int row = -1; row < NbRows + 1; row++)
-                {
-                    for (int column = -1; column < NbColumns + 1; column++)
-                    {
-                        _Data[row + 1, column + 1] = new Tile();
-                    }
-                }
-                //for (int row = -1; row < NB_ROWS; row++)
-                //{
-                //    for (int column = -1; column < NB_COLUMNS; column++)
-                //    {
-                //        GetTile(row, column) = new Tile();
-                //    }
-                //}
+                AllocateBoardContent();
 
                 Random randomNbGenerator = new Random();
                 int nbMinesPlaced = 0;
@@ -64,7 +43,7 @@ namespace EvolirisCSharpTraining
                 {
                     int mineRow = randomNbGenerator.Next(0, NbRows);
                     int mineColumn = randomNbGenerator.Next(0, NbColumns);
-                    TilePosition minePosition = new TilePosition(mineRow, mineColumn);
+                    Position minePosition = new Position(mineRow, mineColumn);
 
                     bool isTileAlreadyMined = GetTile(minePosition).IsMined();
                     if (isTileAlreadyMined)
@@ -76,23 +55,52 @@ namespace EvolirisCSharpTraining
                 }
             }
 
-            public List<TilePosition> GetPosOfNeighbours(TilePosition tilePos)
+            public void AllocateBoardContent()
             {
-                //At first do not care whether the neighbour is within the board or not
-                List<TilePosition> posOfNeighboursUnfiltered = new List<TilePosition>();
-                posOfNeighboursUnfiltered.Add(new TilePosition(tilePos.Row - 1, tilePos.Column - 1));
-                posOfNeighboursUnfiltered.Add(new TilePosition(tilePos.Row - 1, tilePos.Column - 1));
-                posOfNeighboursUnfiltered.Add(new TilePosition(tilePos.Row - 1, tilePos.Column));
-                posOfNeighboursUnfiltered.Add(new TilePosition(tilePos.Row - 1, tilePos.Column + 1));
-                posOfNeighboursUnfiltered.Add(new TilePosition(tilePos.Row, tilePos.Column - 1));
-                posOfNeighboursUnfiltered.Add(new TilePosition(tilePos.Row, tilePos.Column + 1));
-                posOfNeighboursUnfiltered.Add(new TilePosition(tilePos.Row + 1, tilePos.Column - 1));
-                posOfNeighboursUnfiltered.Add(new TilePosition(tilePos.Row + 1, tilePos.Column));
-                posOfNeighboursUnfiltered.Add(new TilePosition(tilePos.Row + 1, tilePos.Column + 1));
+                //_Data is padded with one "ghost node" on each side of the board
+                //This allows to safely search for tile neighbours anywhere whithin board
+                _BoardContent = new Tile[NbRows + 2, NbColumns + 2];
 
-                //Then filter out the neighbours that are outside of board
-                List<TilePosition> posOfNeighbours = new List<TilePosition>();
-                foreach (TilePosition eachPos in posOfNeighboursUnfiltered)
+                for (int row = -1; row < NbRows + 1; row++)
+                {
+                    for (int column = -1; column < NbColumns + 1; column++)
+                    {
+                        _BoardContent[row + 1, column + 1] = new Tile();
+                    }
+                }
+            }
+
+            public bool IsTileExplored(Position tilePosition)
+            { return GetTile(tilePosition).IsExplored(); }
+
+            public void ExploreTile(Position tilePosition)
+            { GetTile(tilePosition).Explore(); }
+            
+            public bool hasNeighbourWithMines(Position tilePosition)
+            {
+                int nbNeighbouringMines = CountNeighbouringMines(tilePosition);
+                bool hasNeighbourWithMines = (nbNeighbouringMines > 0);
+                return hasNeighbourWithMines;
+            }
+
+            public List<Position> GetPosOfNeighbours(Position tilePos)
+            {
+                //At first list all neighbours without caring whether they 
+                //are within the board or not
+                List<Position> posOfNeighboursUnfiltered = new List<Position>();
+                posOfNeighboursUnfiltered.Add(new Position(tilePos.Row - 1, tilePos.Column - 1));
+                posOfNeighboursUnfiltered.Add(new Position(tilePos.Row - 1, tilePos.Column - 1));
+                posOfNeighboursUnfiltered.Add(new Position(tilePos.Row - 1, tilePos.Column));
+                posOfNeighboursUnfiltered.Add(new Position(tilePos.Row - 1, tilePos.Column + 1));
+                posOfNeighboursUnfiltered.Add(new Position(tilePos.Row, tilePos.Column - 1));
+                posOfNeighboursUnfiltered.Add(new Position(tilePos.Row, tilePos.Column + 1));
+                posOfNeighboursUnfiltered.Add(new Position(tilePos.Row + 1, tilePos.Column - 1));
+                posOfNeighboursUnfiltered.Add(new Position(tilePos.Row + 1, tilePos.Column));
+                posOfNeighboursUnfiltered.Add(new Position(tilePos.Row + 1, tilePos.Column + 1));
+
+                //Then filter out neighbours that are outside of board
+                List<Position> posOfNeighbours = new List<Position>();
+                foreach (Position eachPos in posOfNeighboursUnfiltered)
                 {
                     if (this.ContainsTilePos(eachPos))
                     { posOfNeighbours.Add(eachPos); }
@@ -101,24 +109,18 @@ namespace EvolirisCSharpTraining
                 return posOfNeighbours;
             }
 
-            public bool ContainsTilePos(TilePosition tilePosition)
+            public bool ContainsTilePos(Position tilePosition)
             {
                 return (tilePosition.Row >= 0) && (tilePosition.Row < NbRows)
                     && (tilePosition.Column >= 0) && (tilePosition.Column < NbColumns);
             }
 
             public Tile GetTile(int row, int column)
-            { return _Data[row + 1, column + 1]; }
+            { return _BoardContent[row + 1, column + 1]; }
 
-            public Tile GetTile(TilePosition tilePosition)
+            public Tile GetTile(Position tilePosition)
             { return GetTile(tilePosition.Row, tilePosition.Column); }
 
-            public Tile GetTileTmp(TilePosition minePosition)
-            { return _Data[minePosition.Row, minePosition.Column]; }
-
-            /// <summary>
-            /// Displays board on screen
-            /// </summary>
             public void Display()
             {
                 //Put cursor back at console's (0,0) so that new array rewrites old array.
@@ -132,39 +134,17 @@ namespace EvolirisCSharpTraining
                 {
                     for (int numColumn = 0; numColumn < NbColumns; numColumn++)
                     {
-                        Tile currentTile = GetTile(new TilePosition(numRow, numColumn));
-                        TilePosition currentPos = new TilePosition(numRow, numColumn);
-                        Console.Write(this.DisplayTile(currentTile, currentPos));
+                        Position currentPosition = new Position(numRow, numColumn);
+                        Tile currentTile = GetTile(currentPosition);
+                        int nbNeighbouringMines = CountNeighbouringMines(currentPosition);
+                        Console.Write(currentTile.ToString(nbNeighbouringMines));
                     }
                     Console.WriteLine();
                 }
             }
 
-            /// <summary>
-            /// Returns the one-character string to dispaly for a given tile
-            /// </summary>
-            /// <returns>One-character string to display</returns>
-            private string DisplayTile(Tile tile, TilePosition tilePosition)
-            {
-                string tileString = tile.toString();
-
-                if (tileString != "#")
-                { return tileString; }
-
-                //Determine which number to display
-                int nbNeighbouringMines = CountNeighbouringMines(tilePosition);
-                if (nbNeighbouringMines == 0)
-                { return "-"; }
-                else
-                { return nbNeighbouringMines.ToString("0"); }
-            }
-
-            /// <summary>
             /// Returns a List<Tile> of the 8 Tile neighbours of a give Tile
-            /// </summary>
-            /// <param name="currentPos">Position of tile whose neighbours must be found</param>
-            /// <returns>A List<Tile> of all neighbours of tile</param></returns>
-            private List<Tile> GetTileNeighbours(TilePosition currentPos)
+            private List<Tile> GetTileNeighbours(Position currentPos)
             {
                 List<Tile> neighbours = new List<Tile>();
                 neighbours.Add(GetTile(currentPos.Row - 1, currentPos.Column - 1));
@@ -178,7 +158,7 @@ namespace EvolirisCSharpTraining
                 return neighbours;
             }
 
-            public int CountNeighbouringMines(TilePosition tilePosition)
+            public int CountNeighbouringMines(Position tilePosition)
             {
                 int nbMines = 0;
                 foreach (Tile neighbour in GetTileNeighbours(tilePosition))
@@ -189,73 +169,73 @@ namespace EvolirisCSharpTraining
                 return nbMines;
             }
 
-            private Tile[,] _Data;
+            private Tile[,] _BoardContent;
             public int NbRows { get; }
             public int NbColumns { get; }
             public enum TypeTileType { Clear, Mine };
             public enum TypeTileStatus { Unexplored, Explored, Flagged };
 
-            /// <summary>
             /// One of the tiles of the board.
             /// A tile can contain a mine or not.
             /// A tile can be flagged, explored or unexplored.
-            /// </summary>
             public class Tile
             {
-                public Tile()
-                { /*Do nothing*/ }
+                public bool IsMined() { return (TileType == TypeTileType.Mine); }
+                public bool IsExplored() { return (TileStatus == TypeTileStatus.Explored); }
+                public bool IsFlagged() { return (TileStatus == TypeTileStatus.Flagged); }
 
-                public bool IsMined()
-                { return (TileType == TypeTileType.Mine); }
-
-                public bool IsExplored()
-                { return (TileStatus == TypeTileStatus.Explored); }
-
-                public bool IsFlagged()
-                { return (TileStatus == TypeTileStatus.Flagged); }
-
-                public void Explore()
-                { TileStatus = TypeTileStatus.Explored; }
+                public void Explore() { TileStatus = TypeTileStatus.Explored; }
+                public void PlaceMine() { TileType = TypeTileType.Mine; }
 
                 public void ToggleFlag()
                 {
                     TileStatus = (TileStatus == TypeTileStatus.Flagged) ?
                                  TypeTileStatus.Unexplored : TypeTileStatus.Flagged;
                 }
-                /// <summary>
-                /// Returns one-character string corresponding to what must be displayed
-                /// </summary>
-                /// <returns>Returns one-character string if not a number, returns "#" if is a number</returns>
-                public string toString()
+
+                /// Returns the one-character string that must be displayed
+                /// on the tile when Board.Display() is called.
+
+                /// Returns either the exact character to display
+                /// or "#" which will have to be replaced with the number of mines around
+                public override string ToString()
                 {
                     switch (TileStatus)
                     {
-                        case TypeTileStatus.Unexplored:
-                            return "O";
-                        case TypeTileStatus.Flagged:
-                            return "F";
+                        case TypeTileStatus.Unexplored: return "O";
+                        case TypeTileStatus.Flagged: return "F";
                         case TypeTileStatus.Explored:
                             switch (TileType)
                             {
-                                case TypeTileType.Mine:
-                                    return "*";
-                                case TypeTileType.Clear:
-                                    return "#";
-                                default: Environment.Exit((int)TypeErrorCode.GENERIC_ERROR); return "";
+                                case TypeTileType.Mine: return "*";
+                                case TypeTileType.Clear: return "#";
+                                default:
+                                    Environment.Exit((int)TypeErr.GENERIC_ERROR);
+                                    return "";
                             }
-                        default: Environment.Exit((int)TypeErrorCode.GENERIC_ERROR); return "";
+                        default:
+                            Environment.Exit((int)TypeErr.GENERIC_ERROR);
+                            return "";
                     }
                 }
 
-                public void PlaceMine()
-                { TileType = TypeTileType.Mine; }
+                public string ToString(int nbNeighbouringMines)
+                {
+                    string output = this.ToString();
+                    if(output == "#")
+                    {
+                        return ((nbNeighbouringMines == 0) ? "-"
+                            : nbNeighbouringMines.ToString("0") );
+                    }
+                    return output;
+                }
 
                 private TypeTileType TileType = TypeTileType.Clear;
                 private TypeTileStatus TileStatus = TypeTileStatus.Unexplored;
             }
         }
 
-        class Cursor : TilePosition
+        class Cursor : Position
         {
             public Cursor() :base(0,0)
             { /*Do nothing*/ }
@@ -263,7 +243,7 @@ namespace EvolirisCSharpTraining
             public void Refresh(Board board)
             { PlaceOnTile(this, board); }
 
-            public void PlaceOnTile(TilePosition tilePosition, Board board)
+            public void PlaceOnTile(Position tilePosition, Board board)
             {
                 int cursorX = tilePosition.Column;
                 int cursorY = board.NbRows - 1 - tilePosition.Row;
@@ -319,7 +299,7 @@ namespace EvolirisCSharpTraining
             {
                 _Board.Display();
 
-                TilePosition startingTile = new TilePosition(0, 0);
+                Position startingTile = new Position(0, 0);
                 _Cursor.PlaceOnTile(startingTile, _Board);
 
                 bool isGameContinuing = true;
@@ -365,27 +345,23 @@ namespace EvolirisCSharpTraining
             public void FlagCurrentTile()
             { _Board.GetTile(_Cursor).ToggleFlag(); }
 
-            public void PropagateSafeZone(TilePosition centerOfPropagation)
+            public void PropagateSafeZone(Position centerOfPropagation)
             {
-                //Explore the current tile
-                _Board.GetTile(centerOfPropagation).Explore();
+                _Board.ExploreTile(centerOfPropagation);
 
-                //Propagation stops when one of the cell's neighbour is a mine
-                int nbNeighbouringMines = _Board.CountNeighbouringMines(centerOfPropagation);
-                bool isNeighbourWithMine = (nbNeighbouringMines > 0);
-                if (isNeighbourWithMine)
+                if (_Board.hasNeighbourWithMines(centerOfPropagation))
                 { return; }
 
                 //Propagate to all neighbours
-                List<TilePosition> posOfNeighbours = _Board.GetPosOfNeighbours(centerOfPropagation);
-                foreach (TilePosition posOfNeighbour in posOfNeighbours)
+                foreach (Position posOfNeighbour
+                    in _Board.GetPosOfNeighbours(centerOfPropagation))
                 {
-                    bool isNeighbourAlreadyExplored = _Board.GetTile(posOfNeighbour).IsExplored();
+                    bool isNeighbourAlreadyExplored = _Board.IsTileExplored(posOfNeighbour);
                     if (!isNeighbourAlreadyExplored)
                     { PropagateSafeZone(posOfNeighbour); }
                 }
 
-                return;                
+                return;
             }
 
             private Cursor _Cursor;
