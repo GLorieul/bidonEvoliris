@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 namespace EvolirisCSharpTraining
 {
-    public enum TypeErr { GENERIC_ERROR=1 }
-
     namespace Minesweeper
     {
         class Main
@@ -243,13 +241,9 @@ namespace EvolirisCSharpTraining
                             {
                                 case TypeTileType.Mine: return "*";
                                 case TypeTileType.Clear: return "#";
-                                default:
-                                    Environment.Exit((int)TypeErr.GENERIC_ERROR);
-                                    return "";
+                                default: return "?";
                             }
-                        default:
-                            Environment.Exit((int)TypeErr.GENERIC_ERROR);
-                            return "";
+                        default: return "?";
                     }
                 }
 
@@ -333,7 +327,6 @@ namespace EvolirisCSharpTraining
                 const int NB_ROWS = 10;
                 const int NB_COLUMNS = 10;
                 _Board = new Board(NB_MINES, NB_ROWS, NB_COLUMNS);
-
                 _Cursor = new Cursor();
             }
 
