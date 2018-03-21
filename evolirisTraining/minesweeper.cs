@@ -211,9 +211,17 @@ namespace EvolirisCSharpTraining
                 public bool IsExplored()
                 { return (TileStatus == TypeTileStatus.Explored); }
 
+                public bool IsFlagged()
+                { return (TileStatus == TypeTileStatus.Flagged); }
+
                 public void Explore()
                 { TileStatus = TypeTileStatus.Explored; }
 
+                public void ToggleFlag()
+                {
+                    TileStatus = (TileStatus == TypeTileStatus.Flagged) ?
+                                 TypeTileStatus.Unexplored : TypeTileStatus.Flagged;
+                }
                 /// <summary>
                 /// Returns one-character string corresponding to what must be displayed
                 /// </summary>
@@ -325,10 +333,16 @@ namespace EvolirisCSharpTraining
                         case ConsoleKey.RightArrow: _Cursor.MoveRightwards(_Board); break;
                         case ConsoleKey.DownArrow: _Cursor.MoveDownwards(_Board); break;
                         case ConsoleKey.UpArrow: _Cursor.MoveUpwards(_Board); break;
-                        case ConsoleKey.Enter: ExploreCurrentTile(isGameContinuing); break;
+                        case ConsoleKey.Enter:
+                            if ( ! _Board.GetTile(_Cursor).IsFlagged())
+                            { ExploreCurrentTile(isGameContinuing); }
+                            break;
+                        case ConsoleKey.Delete: FlagCurrentTile(); break;
                         //Del = reset
                         case ConsoleKey.Escape: isGameContinuing = false; continue;
                     }
+                    _Board.Display();
+                    _Cursor.Refresh(_Board);
                     System.Threading.Thread.Sleep(100);
                 }
             }
@@ -342,13 +356,14 @@ namespace EvolirisCSharpTraining
                     return;
                 }
 
-                //_Board.GetTile(_Cursor).Explore();
-
                 PropagateSafeZone(_Cursor);
 
                 _Board.Display();
                 _Cursor.Refresh(_Board);
             }
+
+            public void FlagCurrentTile()
+            { _Board.GetTile(_Cursor).ToggleFlag(); }
 
             public void PropagateSafeZone(TilePosition centerOfPropagation)
             {
