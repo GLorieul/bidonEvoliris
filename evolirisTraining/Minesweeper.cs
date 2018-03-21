@@ -77,10 +77,16 @@ namespace EvolirisCSharpTraining
             { return GetTile(tilePosition).IsFlagged(); }
 
             public void ExploreTile(Position tilePosition)
-            { GetTile(tilePosition).Explore(); }
+            {
+                GetTile(tilePosition).Explore();
+                DisplayTile(tilePosition);
+            }
 
             public void FlagTile(Position tilePosition)
-            { GetTile(tilePosition).ToggleFlag(); }
+            {
+                GetTile(tilePosition).ToggleFlag();
+                DisplayTile(tilePosition);
+            }
 
             public bool hasNeighbourWithMines(Position tilePosition)
             {
@@ -147,23 +153,28 @@ namespace EvolirisCSharpTraining
                 }
             }
 
-            public void DisplayCurrentTile(Cursor cursor)
-            { DisplayTile(cursor, cursor); }
-
-            public void DisplayTile(Position posOfTile, Cursor cursor)
+            public void DisplayTile(Position posOfTile)
             {
-                Cursor originalCursor = new Cursor(cursor);
-                cursor.PlaceOnTile(posOfTile, this);
-                WriteTileAtCursor(cursor); //Also moves cursor by one
-                cursor.PlaceOnTile(originalCursor, this);
+                int oldCursorLeft = Console.CursorLeft;
+                int oldCursorTop = Console.CursorTop;
+                SetConsoleCursorPosition(posOfTile);
+                WriteTileAtCursor(posOfTile); //Also moves cursor by one
+                Console.SetCursorPosition(oldCursorLeft, oldCursorTop);
+            }
+
+            //Moves the console cursor without altering Cursor objects
+            private void SetConsoleCursorPosition(Position posOfTile)
+            {
+                Cursor newCursor = new Cursor();
+                newCursor.PlaceOnTile(posOfTile, this);
             }
 
             //Because the cursor is being moved after each write, this function
             //would be dangerous to be called by code outside the Board class
-            private void WriteTileAtCursor(Cursor cursor)
+            private void WriteTileAtCursor(Position posOfTile)
             {
-                Tile currentTile = GetTile(cursor);
-                int nbNeighbouringMines = CountNeighbouringMines(cursor);
+                Tile currentTile = GetTile(posOfTile);
+                int nbNeighbouringMines = CountNeighbouringMines(posOfTile);
                 Console.Write(currentTile.ToString(nbNeighbouringMines));
             }
 
@@ -350,15 +361,10 @@ namespace EvolirisCSharpTraining
                             break;
                         case ConsoleKey.Delete:
                             if (!_Board.IsTileExplored(_Cursor))
-                            {
-                                _Board.FlagTile(_Cursor);
-                                _Board.DisplayCurrentTile(_Cursor);
-                            }
+                            { _Board.FlagTile(_Cursor); }
                             break;
-                        //Del = reset
                         case ConsoleKey.Escape: isGameContinuing = false; continue;
                     }
-                    _Cursor.Refresh(_Board);
                     System.Threading.Thread.Sleep(100);
                 }
             }
@@ -378,7 +384,6 @@ namespace EvolirisCSharpTraining
             public void PropagateSafeZone(Position centerOfPropagation)
             {
                 _Board.ExploreTile(centerOfPropagation);
-                _Board.DisplayTile(centerOfPropagation, _Cursor);
 
                 if (_Board.hasNeighbourWithMines(centerOfPropagation))
                 { return; }
