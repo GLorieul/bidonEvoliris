@@ -9,10 +9,11 @@ namespace EvolirisCSharpTraining
         {
             Console.Title = "Ma Console Cherie";
 
-            MainMenu menuSession = new MainMenu();
-            menuSession.Run();
+            //MainMenu menuSession = new MainMenu();
+            //menuSession.Run();
 
             //Session03.Exercise02.Main.Run();
+            Minesweeper.Main.Run();
         }
 
     }
